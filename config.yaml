@@ -1,0 +1,10 @@
+redis:
+  addr: localhost:6379
+  db: 0
+  password:
+channels:
+  - name: default
+    ratelimit: 10/s
+  - name: mail
+    ratelimit: 300/h
+

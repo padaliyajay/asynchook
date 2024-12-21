@@ -1,24 +1,48 @@
 package main
 
 import (
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
 
 type RateLimiter struct {
-	tokens    int
-	maxTokens int
+	tokens    uint64
+	maxTokens uint64
 	tokenRate time.Duration
 	mu        sync.Mutex
 	cond      *sync.Cond
 	stopCh    chan struct{}
 }
 
-func NewRateLimiter(maxTokens int, refillRate time.Duration) *RateLimiter {
+func NewRateLimiter(rateLimit string) *RateLimiter {
+	parts := strings.Split(rateLimit, "/")
+	if len(parts) != 2 {
+		panic("invalid rate limit. Must be in the format of <limit>/<time>. Ex. 20/m 30/s 300/h")
+	}
+
+	limit, err := strconv.ParseUint(parts[0], 10, 64)
+	if err != nil {
+		panic("invalid rate limit. Must be in the format of <limit>/<time>. Ex. 20/m 30/s 300/h")
+	}
+
+	var duration time.Duration
+	switch parts[1] {
+	case "s":
+		duration = time.Second
+	case "m":
+		duration = time.Minute
+	case "h":
+		duration = time.Hour
+	default:
+		panic("invalid rate limit. Must be in the format of <limit>/<time>. Ex. 20/m 30/s 300/h")
+	}
+
 	rl := &RateLimiter{
-		tokens:    maxTokens,
-		maxTokens: maxTokens,
-		tokenRate: refillRate,
+		tokens:    limit,
+		maxTokens: limit,
+		tokenRate: duration / time.Duration(limit),
 		stopCh:    make(chan struct{}),
 	}
 	rl.cond = sync.NewCond(&rl.mu)

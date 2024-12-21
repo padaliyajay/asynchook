@@ -1,12 +1,37 @@
 package main
 
-import "time"
+import (
+	"flag"
+	"sync"
+)
 
 func main() {
-	broker := NewRedisBroker("redis://localhost:6379/0")
-	defer broker.Close()
+	var config_file string
+	flag.StringVar(&config_file, "config", "config.yaml", "config file path")
+	flag.Parse()
 
-	manager := NewHookManager("default", NewRateLimiter(20, time.Minute/20))
+	if config, err := LoadConfig(config_file); err != nil {
+		panic(err)
+	} else {
+		broker := NewRedisBroker(config.Redis.Addr, config.Redis.Password, config.Redis.DB)
+		defer broker.Close()
 
-	broker.Run(manager)
+		var wq sync.WaitGroup
+
+		for _, channel := range config.Channels {
+			wq.Add(1)
+
+			rateLimiter := NewRateLimiter(channel.Ratelimit)
+			defer rateLimiter.Stop()
+
+			manager := NewHookManager(channel.Name, rateLimiter)
+
+			go (func() {
+				defer wq.Done()
+				broker.Run(manager)
+			})()
+		}
+
+		wq.Wait()
+	}
 }

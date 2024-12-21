@@ -76,13 +76,12 @@ func (b *RedisBroker) Close() {
 	b.client.Close()
 }
 
-func NewRedisBroker(url string) *RedisBroker {
-	opt, err := redis.ParseURL(url)
-	if err != nil {
-		panic(err)
-	}
-
-	client := redis.NewClient(opt)
+func NewRedisBroker(addr string, password string, db int) *RedisBroker {
+	client := redis.NewClient(&redis.Options{
+		Addr:     addr,
+		Password: password,
+		DB:       db,
+	})
 
 	return &RedisBroker{
 		client: client,
