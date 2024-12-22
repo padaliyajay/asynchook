@@ -23,6 +23,7 @@ channels:
 ```
 
 ### Usage
+##### Send event to redis
 ```bash
 HSET asynchook:1001 id 1001 url http://localhost:8080/mail payload '[YOUR JSON TEXT]' timestamp 1600000000 secret '[Your Secret]'
 ZADD asynchooks:default 1 1001
