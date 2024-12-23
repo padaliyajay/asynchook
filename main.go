@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 )
 
 func main() {
@@ -13,7 +17,9 @@ func main() {
 	if config, err := LoadConfig(config_file); err != nil {
 		panic(err)
 	} else {
-		broker := NewRedisBroker(config.Redis.Addr, config.Redis.Password, config.Redis.DB)
+		ctx, cancel := context.WithCancel(context.Background())
+
+		broker := NewRedisBroker(ctx, config.Redis.Addr, config.Redis.Password, config.Redis.DB)
 		defer broker.Close()
 
 		var wq sync.WaitGroup
@@ -32,6 +38,12 @@ func main() {
 			})()
 		}
 
+		// Handle termination signals
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+		<-sigCh
+		cancel()
 		wq.Wait()
 	}
 }

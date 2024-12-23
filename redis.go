@@ -10,12 +10,11 @@ import (
 
 type RedisBroker struct {
 	client *redis.Client
+	ctx    context.Context
 }
 
 func (b *RedisBroker) getHook(id string) (*HookEvent, error) {
-	ctx := context.Background()
-
-	result, err := b.client.HMGet(ctx, "asynchook:"+id, "url", "payload", "timestamp", "secret").Result()
+	result, err := b.client.HMGet(b.ctx, "asynchook:"+id, "url", "payload", "timestamp", "secret").Result()
 
 	if err != nil {
 		return nil, err
@@ -43,31 +42,32 @@ func (b *RedisBroker) getHook(id string) (*HookEvent, error) {
 }
 
 func (b *RedisBroker) deleteRawHook(id string) error {
-	ctx := context.Background()
-
-	_, err := b.client.Del(ctx, "asynchook:"+id).Result()
+	_, err := b.client.Del(b.ctx, "asynchook:"+id).Result()
 
 	return err
 }
 
 func (b *RedisBroker) Run(manager *HookManager) {
-	ctx := context.Background()
-
 	for {
-		result, _ := b.client.BZPopMin(ctx, time.Minute, "asynchooks:"+manager.Channel).Result()
+		select {
+		case <-b.ctx.Done():
+			return
+		default:
+			result, _ := b.client.BZPopMin(b.ctx, time.Minute, "asynchooks:"+manager.Channel).Result()
 
-		if result != nil {
-			id := result.Member.(string)
+			if result != nil {
+				id := result.Member.(string)
 
-			hook, err := b.getHook(id)
-			if err != nil {
-				fmt.Println(err)
-				continue
+				hook, err := b.getHook(id)
+				if err != nil {
+					fmt.Println(err)
+					continue
+				}
+
+				b.deleteRawHook(id)
+
+				manager.Process(hook)
 			}
-
-			b.deleteRawHook(id)
-
-			manager.Process(hook)
 		}
 	}
 }
@@ -76,7 +76,7 @@ func (b *RedisBroker) Close() {
 	b.client.Close()
 }
 
-func NewRedisBroker(addr string, password string, db int) *RedisBroker {
+func NewRedisBroker(ctx context.Context, addr string, password string, db int) *RedisBroker {
 	client := redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: password,
@@ -85,5 +85,6 @@ func NewRedisBroker(addr string, password string, db int) *RedisBroker {
 
 	return &RedisBroker{
 		client: client,
+		ctx:    ctx,
 	}
 }
