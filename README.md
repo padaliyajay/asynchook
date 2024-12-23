@@ -1,17 +1,20 @@
 # Asynchook
 Asynchook allows you run task in background by creating a hook which call your url with specified payload. For example, when you want to send mail, you can make it in background by creating a hook which call your url with mail data. Your specified url will be called with the payload you provided. For that you need to send redis event as description below.
 
-### Build
+### Installation
 ```bash
-go build -o asynchook
+wget https://github.com/padaliyajay/asynchook/releases/download/v1.0/asynchook_1.0.0_amd64.deb
+dpkg -i asynchook_1.0.0_amd64.deb
+systemctl enable asynchook
 ```
 
 ### Run
 ```bash
-./asynchook --config=/etc/asynchook/config.yaml
+systemctl start asynchook
 ```
 
 ### Configuration
+File: /etc/asynchook/config.yaml
 ```yaml
 redis:
   addr: localhost:6379
