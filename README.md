@@ -3,7 +3,7 @@ Asynchook allows you run task in background by creating a hook which call your u
 
 ### Installation
 ```bash
-wget https://github.com/padaliyajay/asynchook/releases/download/v1.0/asynchook_1.0.0_amd64.deb
+wget https://github.com/padaliyajay/asynchook/releases/download/v1.0.1/asynchook_1.0.1_amd64.deb
 dpkg -i asynchook_1.0.0_amd64.deb
 systemctl enable asynchook
 ```

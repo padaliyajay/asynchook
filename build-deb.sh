@@ -5,7 +5,7 @@ set -e
 
 # Variables
 APP_NAME="asynchook"       # Name of your application
-VERSION="1.0.0"            # Version of your application
+VERSION="1.0.1"            # Version of your application
 ARCH="amd64"               # Architecture (amd64, arm64, all, etc.)
 BUILD_DIR="./build"        # Temporary build directory
 PACKAGE_DIR="./package"    # Package structure directory
