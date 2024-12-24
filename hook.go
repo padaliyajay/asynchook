@@ -4,24 +4,23 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 type HookEvent struct {
 	Id        string
 	Url       string
 	Payload   string
-	Timestamp uint64
+	Timestamp string
 	Secret    string
 }
 
 func (h *HookEvent) Process() error {
-	data := url.Values{}
-	data.Set("payload", h.Payload)
-	data.Set("timestamp", strconv.FormatUint(h.Timestamp, 10))
-	data.Set("secret", h.Secret)
+	postData := url.Values{}
+	postData.Set("payload", h.Payload)
+	postData.Set("timestamp", h.Timestamp)
+	postData.Set("secret", h.Secret)
 
-	resp, err := http.PostForm(h.Url, data)
+	resp, err := http.PostForm(h.Url, postData)
 
 	if err != nil {
 		return err

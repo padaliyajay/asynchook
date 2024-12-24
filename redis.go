@@ -32,7 +32,7 @@ func (b *RedisBroker) getHook(id string) (*HookEvent, error) {
 		hook.Payload = result[1].(string)
 	}
 	if result[2] != nil { // timestamp
-		hook.Timestamp = result[2].(uint64)
+		hook.Timestamp = result[2].(string)
 	}
 	if result[3] != nil { // secret
 		hook.Secret = result[3].(string)
@@ -53,7 +53,7 @@ func (b *RedisBroker) Run(manager *HookManager) {
 		case <-b.ctx.Done():
 			return
 		default:
-			result, _ := b.client.BZPopMin(b.ctx, time.Minute, "asynchooks:"+manager.Channel).Result()
+			result, _ := b.client.BZPopMin(b.ctx, time.Second*10, "asynchooks:"+manager.Channel).Result()
 
 			if result != nil {
 				id := result.Member.(string)
