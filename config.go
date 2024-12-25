@@ -14,6 +14,7 @@ type Config struct {
 		Password string `yaml:"password"`
 		DB       int    `yaml:"db"`
 	} `yaml:"redis"`
+	LogFile  string `yaml:"logFile"`
 	Channels []struct {
 		Name      string `yaml:"name"`
 		Ratelimit string `yaml:"ratelimit"`
@@ -56,6 +57,7 @@ func createConfigFile(fp string) error {
 			Password: "",
 			DB:       0,
 		},
+		LogFile: "/var/log/asynchook.log",
 		Channels: []struct {
 			Name      string `yaml:"name"`
 			Ratelimit string `yaml:"ratelimit"`

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -60,7 +61,7 @@ func (b *RedisBroker) Run(manager *HookManager) {
 
 				hook, err := b.getHook(id)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					continue
 				}
 

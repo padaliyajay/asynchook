@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -50,7 +51,7 @@ func (s *HookManager) Process(hook *HookEvent) error {
 	s.rl.Acquire()
 	err := hook.Process()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	return err

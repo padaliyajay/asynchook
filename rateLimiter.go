@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"strconv"
 	"strings"
 	"sync"
@@ -19,12 +20,12 @@ type RateLimiter struct {
 func NewRateLimiter(rateLimit string) *RateLimiter {
 	parts := strings.Split(rateLimit, "/")
 	if len(parts) != 2 {
-		panic("invalid rate limit. Must be in the format of <limit>/<time>. Ex. 20/m 30/s 300/h")
+		log.Panic("invalid rate limit. Must be in the format of <limit>/<time>. Ex. 20/m 30/s 300/h")
 	}
 
 	limit, err := strconv.ParseUint(parts[0], 10, 64)
 	if err != nil {
-		panic("invalid rate limit. Must be in the format of <limit>/<time>. Ex. 20/m 30/s 300/h")
+		log.Panic("invalid rate limit. Must be in the format of <limit>/<time>. Ex. 20/m 30/s 300/h")
 	}
 
 	var duration time.Duration
@@ -36,7 +37,7 @@ func NewRateLimiter(rateLimit string) *RateLimiter {
 	case "h":
 		duration = time.Hour
 	default:
-		panic("invalid rate limit. Must be in the format of <limit>/<time>. Ex. 20/m 30/s 300/h")
+		log.Panic("invalid rate limit. Must be in the format of <limit>/<time>. Ex. 20/m 30/s 300/h")
 	}
 
 	rl := &RateLimiter{

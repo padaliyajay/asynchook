@@ -3,8 +3,8 @@ Asynchook allows you run task in background by creating a hook which call your u
 
 ### Installation
 ```bash
-wget https://github.com/padaliyajay/asynchook/releases/download/v1.0.1/asynchook_1.0.1_amd64.deb
-dpkg -i asynchook_1.0.0_amd64.deb
+wget https://github.com/padaliyajay/asynchook/releases/download/v1.0.2/asynchook_1.0.2_amd64.deb
+dpkg -i asynchook_1.0.2_amd64.deb
 systemctl enable asynchook
 ```
 
@@ -16,10 +16,18 @@ systemctl start asynchook
 ### Configuration
 File: /etc/asynchook/config.yaml
 ```yaml
+# Redis configuration
+# Asynchook uses redis for message queueing
 redis:
   addr: localhost:6379
   db: 0
   password:
+
+# Asynchook error log
+# logFile: /var/log/asynchook.log
+
+# Asynchook channels
+# You can add multiple channels with different ratelimits
 channels:
   - name: default
     ratelimit: 2/s # rate limit for this channel Ex. 2/s, 60/m, 300/h
@@ -28,10 +36,10 @@ channels:
 ### Usage
 ##### Send event to redis
 ```bash
-HSET asynchook:1001 id 1001 url http://localhost:8080/mail payload '[YOUR JSON TEXT]' timestamp 1600000000 secret '[Your Secret]'
+HSET asynchook:1001 id 1001 url http://localhost:8080/mail payload '[YOUR JSON TEXT]' secret '[Your Secret]'
 ZADD asynchooks:default 1 1001
 ```
-Here Id and URL are mandatory fields. But payload, timestamp and secret are optional.
+Here Id and URL are mandatory fields. But payload and secret are optional.
 
 ## License
 MIT

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
 	"os"
 	"os/signal"
 	"sync"
@@ -15,8 +16,18 @@ func main() {
 	flag.Parse()
 
 	if config, err := LoadConfig(config_file); err != nil {
-		panic(err)
+		log.Fatal(err)
 	} else {
+		// Create log file if specified and set log output to it
+		if config.LogFile != "" {
+			f, err := os.OpenFile(config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer f.Close()
+			log.SetOutput(f)
+		}
+
 		ctx, cancel := context.WithCancel(context.Background())
 
 		broker := NewRedisBroker(ctx, config.Redis.Addr, config.Redis.Password, config.Redis.DB)

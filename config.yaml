@@ -1,8 +1,15 @@
+# Redis configuration
+# Asynchook uses redis for message queueing
 redis:
   addr: localhost:6379
   db: 0
   password:
+
+# Asynchook error log
+# logFile: /var/log/asynchook.log
+
+# Asynchook channels
+# You can add multiple channels with different ratelimits
 channels:
   - name: default
     ratelimit: 2/s
-
