@@ -38,14 +38,12 @@ func main() {
 		for _, channel := range config.Channels {
 			wq.Add(1)
 
-			rateLimiter := NewRateLimiter(channel.Ratelimit)
-			defer rateLimiter.Stop()
-
-			manager := NewHookManager(channel.Name, rateLimiter)
+			hookManager := NewHookManager(broker, channel.Name, channel.Ratelimit)
+			defer hookManager.Stop()
 
 			go (func() {
 				defer wq.Done()
-				broker.Run(manager)
+				hookManager.Run()
 			})()
 		}
 

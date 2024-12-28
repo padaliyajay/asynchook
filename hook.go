@@ -2,23 +2,24 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 type HookEvent struct {
-	Id        string
-	Url       string
-	Payload   string
-	Timestamp string
-	Secret    string
+	Id             string
+	Url            string
+	Payload        string
+	Secret         string
+	Run_after_time time.Time
+	Expire_time    time.Time
+	Retry_count    int
 }
 
 func (h *HookEvent) Process() error {
 	postData := url.Values{}
 	postData.Set("payload", h.Payload)
-	postData.Set("timestamp", h.Timestamp)
 	postData.Set("secret", h.Secret)
 
 	resp, err := http.PostForm(h.Url, postData)
@@ -33,26 +34,5 @@ func (h *HookEvent) Process() error {
 		return fmt.Errorf("failed to send hook event to %s: %s", h.Url, resp.Status)
 	}
 
-	fmt.Println("hook event sent to", h.Url)
-
 	return nil
-}
-
-type HookManager struct {
-	Channel string
-	rl      *RateLimiter
-}
-
-func NewHookManager(channel string, rl *RateLimiter) *HookManager {
-	return &HookManager{channel, rl}
-}
-
-func (s *HookManager) Process(hook *HookEvent) error {
-	s.rl.Acquire()
-	err := hook.Process()
-	if err != nil {
-		log.Println(err)
-	}
-
-	return err
 }
