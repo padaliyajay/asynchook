@@ -1,5 +1,13 @@
 # Asynchook
+Offload heavy task from the synchronous process to run later as web hook. 
+
 Asynchook allows you run task in background by creating a hook which call your url with specified payload. For example, when you want to send mail, you can make it in background by creating a hook which call your url with mail data. Your specified url will be called with the payload you provided. For that you need to send redis event as description below.
+
+### Use cases
+- Sending email on user action but don't make your user wait for confirmation while waiting for smtp response. 
+- Send bulk notification email with rate limit
+- Call web hook with automatic retry on fail
+- Run task in background
 
 ### Installation
 ```bash
