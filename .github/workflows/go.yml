@@ -1,0 +1,39 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        # build.sh versions artifacts from `git describe`, which needs the full
+        # history and tags. The default shallow checkout produces 0.0.0+<sha>.
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.24'
+
+    - name: Check
+      run: chmod +x build.sh && ./build.sh check
+
+    - name: Build
+      run: ./build.sh deb
+
+    - name: Upload package
+      uses: actions/upload-artifact@v4
+      with:
+        name: asynchook_amd64.deb
+        path: ./dist/asynchook_*_amd64.deb
+        if-no-files-found: error
