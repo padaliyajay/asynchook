@@ -1,1 +1,6 @@
 dump.rdb
+config.local.yaml
+asynchook
+bin/
+dist/
+*.deb

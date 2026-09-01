@@ -43,6 +43,15 @@ func LoadConfig(fp string) (*Config, error) {
 		return nil, fmt.Errorf("failed to decode config file: %w", err)
 	}
 
+	for i, channel := range config.Channels {
+		if channel.Name == "" {
+			return nil, fmt.Errorf("channels[%d]: name is required", i)
+		}
+		if channel.Ratelimit == "" {
+			return nil, fmt.Errorf("channel %q: ratelimit is required. Ex. 2/s, 60/m, 300/h", channel.Name)
+		}
+	}
+
 	return &config, nil
 }
 
